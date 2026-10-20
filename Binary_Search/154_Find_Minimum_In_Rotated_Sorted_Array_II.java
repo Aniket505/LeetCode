@@ -1,0 +1,43 @@
+class Solution {
+    public int findMin(int[] nums) {
+        int low = 0, high = nums.length - 1, min = Integer.MAX_VALUE;
+
+        // Binary Search loop to find the pivot/minimum element
+        while(low <= high) {
+            int mid = (low + high) / 2;
+            
+            // 2. THE DUPLICATE EDGE CASE:
+            // When nums[low] == nums[mid] == nums[high], we cannot determine which half is sorted.
+            // Example: nums =[3,3,3,1,3,3,3,3,3], target = 1
+            // low = 0 (val:3), mid = 4 (val:1 -> wait, if target=2, mid is 4, etc. Let's look at index values)
+            // If mid points to a 3: low=0(3), mid=4(1), high=9(3) -> mid is not 3 here.
+            // But if nums =, low=0(3), mid=3(3), high=6(3). Both halves look sorted!
+            // Solution: Shrink the search space from both ends until the ambiguity is broken.
+            if((nums[mid] == nums[low]) && (nums[mid] == nums[high])) {
+                min = Math.min(min, nums[low]);
+                low++;
+                high--;
+                continue;
+            }
+            // CASE 1: The LEFT half [low...mid] is sorted.
+            if(nums[mid] >= nums[low]) {
+                // Since this half is sorted, the smallest element in this window is at nums[low].
+                min = Math.min(min, nums[low]);
+                
+                // Eliminate the left half and search for potentially smaller elements in the right half.
+                low = mid + 1;
+            } 
+            // CASE 2: The RIGHT half [mid...high] is sorted.
+            else {
+                // Since this half is sorted, the smallest element in this window is at nums[mid].
+                min = Math.min(min, nums[mid]);
+                
+                // Eliminate the right half and search for potentially smaller elements in the left half.
+                high = mid - 1;
+            }
+        }
+
+        // Return the global minimum found during the search
+        return min;
+    }
+}
